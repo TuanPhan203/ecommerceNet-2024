@@ -30,15 +30,14 @@ jobs:
       run: |
         npx newman run SkiNet.postman_collection.json -e SkiNet.postman_environment.json
 
-    # Xuất báo cáo test JSON
-    - name: Generate Postman Test Report
+    - name: Install Postman CLI
       run: |
-        npx newman run SkiNet.postman_collection.json -e SkiNet.postman_environment.json -r cli,json --reporter-json-export report.json
-
-    # Upload báo cáo test lên GitHub Artifacts
-    - name: Upload Postman Test Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: postman-test-report
-        path: report.json
+          powershell.exe -NoProfile -InputFormat None -ExecutionPolicy AllSigned -Command "[System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://dl-cli.pstmn.io/install/win64.ps1'))"
+    - name: Login to Postman CLI
+      run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+    - name: Run API tests
+      run: |
+          postman collection run "39243572-8549a2fd-5269-4f84-b73b-4e2fdee1df07" -e "39243572-a84083a0-6bf3-44b2-b495-4686e2807580"
+          # Lint your API using Postman CLI
+          postman api lint 149bfc4a-043b-4e19-9420-4621d242a088
       
