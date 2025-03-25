@@ -21,7 +21,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore MyStore.sln
+      run: dotnet restore ecommerceNet-2024/MyStore/MyStore.sln
     - name: Build
       run: dotnet build --no-restore
     - name: Test
