@@ -1,0 +1,44 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+    - name: Run Postman Tests
+      run: |
+        npx newman run SkiNet.postman_collection.json -e SkiNet.postman_environment.json
+
+    # Xuất báo cáo test JSON
+    - name: Generate Postman Test Report
+      run: |
+        npx newman run SkiNet.postman_collection.json -e SkiNet.postman_environment.json -r cli,json --reporter-json-export report.json
+
+    # Upload báo cáo test lên GitHub Artifacts
+    - name: Upload Postman Test Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: postman-test-report
+        path: report.json
+      
